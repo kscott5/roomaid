@@ -1,0 +1,7 @@
+# Visual Code
+.vscode
+obj
+bin
+
+# Open source javascript frameworks and libraries
+wwwroot/lib
