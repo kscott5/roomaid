@@ -4,8 +4,16 @@
   "defaultDestination": "wwwroot",
   "libraries": [
     {
+      "library": "axios@0.18.0",
+      "destination": "wwwroot/lib/axios"
+    },
+    {
       "library": "vue@2.6.10",
       "destination": "wwwroot/lib/vue"
+    },
+    {
+      "library": "vue-router@3.0.3",
+      "destination": "wwwroot/lib/vue/router"
     },
     {
       "library": "bulma@0.7.5",
