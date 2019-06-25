@@ -18,7 +18,7 @@ const newroom = Vue.component('new-room', {
         return {
             labels: {save: 'Save'},
             room: {}
-        }
+        };
     },
     methods: {
         saveData: function(event) {
