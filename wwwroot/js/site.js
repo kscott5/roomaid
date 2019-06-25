@@ -3,27 +3,89 @@
 
 Vue.prototype.$http = axios;
 
+/*
+Pull localization data from server
+*/
+const locales = {
+    labels: {
+        "en-US": {
+            save: 'Save',
+            edit: 'Edit',
+            name: 'Enter room name',
+            description: 'Enter room description'
+        }
+    }
+};
+
 const newroom = Vue.component('new-room', {
     template: `
-        <div>
-            <input type="textbox"  v-model="room.name" placeholder="Enter room name"/>
-            <input type="textarea" v-model="room.description" placeholder="Enter room decription" multiple="5"/>
+        <form>
+            <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
+            <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
             <input type="number" v-model="room.edges" min="3" max="10" />
             <input type="number" v-model="room.length" min="0" max="10"/>
             <input type="number" v-model="room.height" min="0" max="10"/>
             <input type="number" v-model="room.width" min="0" max="10"/>
             <button on-click="saveData">{{labels.save}}</button>
-        </div>`,
+        </form>`,
     data: function() {
         return {
-            labels: {save: 'Save'},
+            labels: locales.labels["en-US"],
+            room: {name:'',description:'',edges:'',length:'',width:'',height:''}
+        };
+    },
+    methods: {
+        saveData: function(event) {
+            var data = this.$data;
+            alert(data);
+            this.$http.post(`api/room/`, data.room)
+                .then(function(response) {
+                    if(response.status == 200) {
+                        this.router.push({path: `/`});
+                    } else {
+                        console.log(response);
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        }}
+});
+
+const editroom = Vue.component('edit-room', {
+    props: ["id"],
+    template: `
+        <form>
+            <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
+            <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
+            <input type="number" v-model="room.edges" min="3" max="10" />
+            <input type="number" v-model="room.length" min="0" max="10"/>
+            <input type="number" v-model="room.height" min="0" max="10"/>
+            <input type="number" v-model="room.width" min="0" max="10"/>
+            <button on-click="saveData">{{labels.save}}</button>
+        </form>`,
+    data: function() {
+        return {
+            labels: locales.labels["en-US"],
             room: {}
         };
     },
     methods: {
         saveData: function(event) {
-            console.log("Saving new room data" + this.data.room);
-        }}
+            var data = this.$data;
+            console.log("Saving new room data" + data.room);
+        }
+    },
+    created: function() {
+        var data = this.$data;
+        var props = this.$props;
+
+        this.$http.get(`/api/room/${props.id}`)
+            .then(function(response) {
+                console.log(response);
+                data.room = response.data;
+            }); 
+    }
 });
 
 const listrooms = Vue.component('list-rooms', {
@@ -38,17 +100,16 @@ const listrooms = Vue.component('list-rooms', {
                         {{room.description}}                        
                     </td>
                     <td>
-                        <button v-on:click="editRoom(room.id)">{{labels.edit}}</button>
+                        <button v-on:click="editRoom(room)">{{labels.edit}}</button>
                     </td>
                 </tr>
             </tbody>
         </table>`,
         data: function() {
             return {
-                message: 'Hello Vue',
-                labels: {edit: 'Edit'},
+                labels: locales.labels["en-US"],
                 rooms: {}
-            }
+            };
         },
         created: function() {
             var vm = this.$data;
@@ -67,8 +128,9 @@ const listrooms = Vue.component('list-rooms', {
                 else
                     room.selected = '';
             },
-            editRoom: function(id) {
-                console.log(id);
+            editRoom: function(room) {
+                console.log(room);
+                router.push({path: `/room/edit/${room.id}`});
             }
         }
 });
@@ -81,6 +143,11 @@ const routes = [
     {
         path: "/room/new",
         component: newroom
+    },
+    {
+        path: "/room/edit/:id",
+        component: editroom,
+        props: true
     }
 ];
 
