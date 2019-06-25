@@ -1,33 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-using RoomAid.Services;
-using RoomAid.Models;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace RoomAid.Pages
 {
     public class IndexModel : PageModel
     {
-        private MongoDataService DataService {get; set;}
-        public IndexModel(MongoDataService service) {
-            this.DataService = service;
+        private ILogger Logger {get; set;}
+        public IndexModel(ILogger logger) {
+            this.Logger = logger;
         }
-        public void OnGet()
-        {
-            var room = new Room{
-                Description = "This is a simple room",
-                Height = 10,
-                Width = 10,
-                Length = 10,
-                RoomName = "Simple Room"
-                
-            };
 
-            room = this.DataService.SaveRoom(room);
+        public void OnGet()
+        {            
         }
     }
 }
