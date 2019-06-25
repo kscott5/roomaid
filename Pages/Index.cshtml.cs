@@ -6,7 +6,7 @@ namespace RoomAid.Pages
     public class IndexModel : PageModel
     {
         private ILogger Logger {get; set;}
-        public IndexModel(ILogger logger) {
+        public IndexModel(ILogger<IndexModel> logger) {
             this.Logger = logger;
         }
 
