@@ -39,5 +39,12 @@ namespace RoomAid.Controllers {
 
             return new ObjectResult(result);
         }
+
+        [HttpPost("update")]
+        public ActionResult<Room>  UpdateRoom(Room room) {
+            var result = this.DataService.UpdateRoom(room);
+
+            return new ObjectResult(result);
+        }
     }
 }
