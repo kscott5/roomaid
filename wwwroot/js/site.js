@@ -20,13 +20,48 @@ const locales = {
 const newroom = Vue.component('new-room', {
     template: `
         <form>
-            <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
-            <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
-            <input type="number" v-model="room.edges" min="3" max="10" />
-            <input type="number" v-model="room.length" min="0" max="10"/>
-            <input type="number" v-model="room.height" min="0" max="10"/>
-            <input type="number" v-model="room.width" min="0" max="10"/>
-            <button v-on:click="saveData">{{labels.save}}</button>
+            <div class="field">
+                <div class="control">
+                    <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
+                </div>
+            <div>
+
+            <div class="field">
+                <div class="control">
+                    <input type="number" v-model="room.edges" min="3" max="10" />
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <input type="number" v-model="room.length" min="0" max="10"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                     <input type="number" v-model="room.height" min="0" max="10"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                     <input type="number" v-model="room.width" min="0" max="10"/>
+                </div>
+            </div>
+
+
+            <div class="field">
+                <p class="control">
+                     <button v-on:click="saveData" class="button is-success">{{labels.save}}</button>
+                </p>
+            </div>
         </form>`,
     data: function() {
         return {
@@ -99,7 +134,7 @@ const listrooms = Vue.component('list-rooms', {
     template:`
         <table class="table">
             <tbody>
-                <tr v-for="room in rooms" v-bind:key="room.id" v-on:mouseover="toggle(room)" class="room.selected">
+                <tr v-for="room in rooms" v-bind:key="room.id" v-on:mouseover="toggle(room)" v-on:mouseout="toggle(room)" v-bind:id="room.id">
                     <td>
                         {{room.name}}
                     </td>
@@ -129,14 +164,14 @@ const listrooms = Vue.component('list-rooms', {
         },
         methods: {
             toggle: function(room) {
-                console.log('toggling');
-                if(room.selected == '')
-                    room.selected = 'is-selected';
+                var el = document.querySelector(`[id='${room.id}']`);
+
+                if(el.classList.contains('is-selected'))
+                    el.classList.remove('is-selected');
                 else
-                    room.selected = '';
+                    el.classList.add('is-selected');
             },
             editRoom: function(room) {
-                console.log(room);
                 router.push({path: `/room/edit/${room.id}`});
             }
         }
