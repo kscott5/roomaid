@@ -16,53 +16,53 @@ const locales = {
         }
     }
 };
+const edit_room_template = `
+<form>
+    <div class="field">
+        <div class="control">
+            <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <input type="number" v-model="room.edges" min="3" max="10" />
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <input type="number" v-model="room.length" min="0" max="10"/>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+             <input type="number" v-model="room.height" min="0" max="10"/>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+             <input type="number" v-model="room.width" min="0" max="10"/>
+        </div>
+    </div>
+
+    <div class="field">
+        <p class="control">
+             <button v-on:click="saveData" class="button is-success">{{labels.save}}</button>
+        </p>
+    </div>
+</form>`;
 
 const newroom = Vue.component('new-room', {
-    template: `
-        <form>
-            <div class="field">
-                <div class="control">
-                    <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control">
-                    <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
-                </div>
-            <div>
-
-            <div class="field">
-                <div class="control">
-                    <input type="number" v-model="room.edges" min="3" max="10" />
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control">
-                    <input type="number" v-model="room.length" min="0" max="10"/>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control">
-                     <input type="number" v-model="room.height" min="0" max="10"/>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control">
-                     <input type="number" v-model="room.width" min="0" max="10"/>
-                </div>
-            </div>
-
-
-            <div class="field">
-                <p class="control">
-                     <button v-on:click="saveData" class="button is-success">{{labels.save}}</button>
-                </p>
-            </div>
-        </form>`,
+    template: edit_room_template,
     data: function() {
         return {
             labels: locales.labels["en-US"],
@@ -76,7 +76,7 @@ const newroom = Vue.component('new-room', {
                 .then(function(response) {
                     console.log(response);
                     if(response.status == 200) {
-                        router.push({path: `/`});
+                        this.$router.push({path: `/`});
                     }
                 })
                 .catch(function(error) {
@@ -87,16 +87,7 @@ const newroom = Vue.component('new-room', {
 
 const editroom = Vue.component('edit-room', {
     props: ["id"],
-    template: `
-        <form>
-            <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
-            <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
-            <input type="number" v-model="room.edges" min="3" max="10" />
-            <input type="number" v-model="room.length" min="0" max="10"/>
-            <input type="number" v-model="room.height" min="0" max="10"/>
-            <input type="number" v-model="room.width" min="0" max="10"/>
-            <button v-on:click="saveData">{{labels.save}}</button>
-        </form>`,
+    template: edit_room_template,
     data: function() {
         return {
             labels: locales.labels["en-US"],
@@ -110,7 +101,7 @@ const editroom = Vue.component('edit-room', {
                 .then(function(response){
                     console.log(response)
                     if(response.status == 200) {
-                        router.push({path: `/`});
+                        this.$router.push({path: `/`});
                     }
                 })
                 .catch(function(error) {
@@ -172,7 +163,7 @@ const listrooms = Vue.component('list-rooms', {
                     el.classList.add('is-selected');
             },
             editRoom: function(room) {
-                router.push({path: `/room/edit/${room.id}`});
+                this.$router.push({path: `/room/edit/${room.id}`});
             }
         }
 });
