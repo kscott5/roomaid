@@ -27,18 +27,34 @@ namespace RoomAid.Services {
             this.Database = client.GetDatabase(databaseName);
         }
 
-        public IList<Room> GetRooms(FilterDefinition<Room> where = null) {
+        public PaginationResult<Room> GetRooms(FilterDefinition<Room> where = null, SortDefinition<Room> sort = null ,int limit = 5, int skip = 0) {
             var collection = this.Database.GetCollection<Room>(Room.COLLECTION_NAME);
 
-            var filter = where ?? FilterDefinition<Room>.Empty;
+            var emptyFilter = FilterDefinition<Room>.Empty;
+            var filter = where ?? emptyFilter;
+            var sortBy = sort ?? Builders<Room>.Sort.Ascending(room => room.Name);
+                        
+            var pageIndex = skip > 0 ? (skip-1)*limit : 0;
+            var pageCount = collection.Find(emptyFilter).CountDocuments()/(limit);
 
-            return collection.Find(filter).ToList();
+            var documents = collection.Find(filter)
+                .Limit(limit)
+                .Sort(sortBy)
+                .Skip(pageIndex)
+                .ToList();
+
+            return new PaginationResult<Room> {
+                Documents = documents,
+                PageCount = pageCount,
+                PageIndex = ++pageIndex
+            };
         }
 
         public Room GetRoom(string id) {
             var where = Builders<Room>.Filter.Where(room => room.Id.Equals(id));
 
-            return GetRooms(where)?.SingleOrDefault();
+            return GetRooms(where)
+                .Documents?.SingleOrDefault();
         }
 
         public Room InsertNewRoom(Room room) {

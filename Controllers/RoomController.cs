@@ -19,7 +19,7 @@ namespace RoomAid.Controllers {
         }
 
         [HttpGet]
-        public ActionResult<IList<Room>> GetRooms() {
+        public ActionResult<PaginationResult<Room>> GetRooms() {
             var rooms = this.DataService.GetRooms();
             return new ObjectResult(rooms);
         }
