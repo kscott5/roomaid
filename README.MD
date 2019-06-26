@@ -4,3 +4,9 @@ dotnet tool install dotnet-aspnet-codegenerator --version 2.2.3 --global
 dotnet-aspnet-codegenerator razorpage App Empty --namespaceName RoomAid.Pages -outDir Pages
 
 sudo docker run -it --expose 27017:27017 --name mongo_dev mongo:latest
+
+# starts the container
+sudo docker start mongo_dev
+
+# starts the container with interactive output viewer
+sudo docker start -i mongo_dev
