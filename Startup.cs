@@ -31,7 +31,7 @@ namespace RoomAid
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            services.AddMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMongoDataService();
         }
