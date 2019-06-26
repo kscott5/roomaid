@@ -26,7 +26,7 @@ const newroom = Vue.component('new-room', {
             <input type="number" v-model="room.length" min="0" max="10"/>
             <input type="number" v-model="room.height" min="0" max="10"/>
             <input type="number" v-model="room.width" min="0" max="10"/>
-            <button on-click="saveData">{{labels.save}}</button>
+            <button v-on:click="saveData">{{labels.save}}</button>
         </form>`,
     data: function() {
         return {
@@ -35,15 +35,13 @@ const newroom = Vue.component('new-room', {
         };
     },
     methods: {
-        saveData: function(event) {
+        saveData: function() {
             var data = this.$data;
-            alert(data);
             this.$http.post(`api/room/`, data.room)
                 .then(function(response) {
+                    console.log(response);
                     if(response.status == 200) {
-                        this.router.push({path: `/`});
-                    } else {
-                        console.log(response);
+                        router.push({path: `/`});
                     }
                 })
                 .catch(function(error) {
@@ -62,7 +60,7 @@ const editroom = Vue.component('edit-room', {
             <input type="number" v-model="room.length" min="0" max="10"/>
             <input type="number" v-model="room.height" min="0" max="10"/>
             <input type="number" v-model="room.width" min="0" max="10"/>
-            <button on-click="saveData">{{labels.save}}</button>
+            <button v-on:click="saveData">{{labels.save}}</button>
         </form>`,
     data: function() {
         return {
@@ -73,7 +71,16 @@ const editroom = Vue.component('edit-room', {
     methods: {
         saveData: function(event) {
             var data = this.$data;
-            console.log("Saving new room data" + data.room);
+            this.$http.post(`api/room/update`, data.room)
+                .then(function(response){
+                    console.log(response)
+                    if(response.status == 200) {
+                        router.push({path: `/`});
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
         }
     },
     created: function() {
