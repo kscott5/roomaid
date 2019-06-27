@@ -18,6 +18,15 @@
     {
       "library": "bulma@0.7.5",
       "destination": "wwwroot/lib/bulma"
+    },
+    {
+      "library": "font-awesome@5.8.2",
+      "destination": "wwwroot/lib/font-awesome"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "bulma-extensions@6.2.7",
+      "destination": "wwwroot/lib/bulma/extensions"
     }
   ]
 }
