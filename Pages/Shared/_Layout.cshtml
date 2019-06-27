@@ -7,39 +7,36 @@
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bulma/css/bulma.css" />
-        
+        <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css"
             integrity="sha256-vK3UTo/8wHbaUn+dTQD0X6dzidqc5l7gczvH+Bnowwk=" 
             crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" 
+            integrity="sha256-BtbhCIbtfeVWGsqxk1vOHEYXS6qcvQvLMZqjtpWUEx8=" 
+            crossorigin="anonymous" />
     </environment>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-
     <section class="section">
-    <div class="container">
-        <partial name="_CookieConsentPartial" />
-        @RenderBody()
-    </div>
-  </section>
-
-    <footer class="">
         <div class="container">
-            &copy; 2019 - RoomAid - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            @RenderBody()
         </div>
-    </footer>
+    </section>
 
     <environment include="Development">
         <script src="~/lib/axios/axios.js"></script>
         <script src="~/lib/vue/vue.js"></script>
         <script src="~/lib/vue/router/vue-router.js"></script>
+        <script src="~/lib/font-awesome/js/all.js" data-auto-a11y="true"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/index.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script> 
         <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.3/dist/vue-router.min.js"></script>
+        <script src="https://use.fontawesome.com/releases/v5.9.0/js/all.js" data-auto-a11y="true"></script>
     </environment>
     <script src="~/js/site.js" type="module" asp-append-version="true"></script>
 
