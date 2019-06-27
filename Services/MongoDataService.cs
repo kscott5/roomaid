@@ -27,26 +27,25 @@ namespace RoomAid.Services {
             this.Database = client.GetDatabase(databaseName);
         }
 
-        public PaginationResult<Room> GetRooms(FilterDefinition<Room> where = null, SortDefinition<Room> sort = null ,int limit = 5, int skip = 0) {
+        public PaginationResult<Room> GetRooms(FilterDefinition<Room> where = null, SortDefinition<Room> sort = null, int page = 1, int limit = 5) {
             var collection = this.Database.GetCollection<Room>(Room.COLLECTION_NAME);
 
             var emptyFilter = FilterDefinition<Room>.Empty;
             var filter = where ?? emptyFilter;
             var sortBy = sort ?? Builders<Room>.Sort.Ascending(room => room.Name);
                         
-            var pageIndex = skip > 0 ? (skip-1)*limit : 0;
             var pageCount = collection.Find(emptyFilter).CountDocuments()/(limit);
-
+            
             var documents = collection.Find(filter)
                 .Limit(limit)
                 .Sort(sortBy)
-                .Skip(pageIndex)
+                .Skip(page > 1 ? (page-1)*limit : 0) // Skip if greater than first page
                 .ToList();
 
             return new PaginationResult<Room> {
                 Documents = documents,
                 PageCount = pageCount,
-                PageIndex = ++pageIndex
+                PageIndex = page
             };
         }
 

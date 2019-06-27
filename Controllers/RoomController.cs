@@ -19,8 +19,8 @@ namespace RoomAid.Controllers {
         }
 
         [HttpGet]
-        public ActionResult<PaginationResult<Room>> GetRooms() {
-            var rooms = this.DataService.GetRooms();
+        public ActionResult<PaginationResult<Room>> GetRooms([FromQuery] int page = 1, int limit = 5) {
+            var rooms = this.DataService.GetRooms(null, null, page, limit);
             return new ObjectResult(rooms);
         }
 
