@@ -17,7 +17,7 @@ const locales = {
             search: {
                 count: 'Display'
             },
-            theaders: {
+            headers: {
                 name: 'Name',
                 description: 'Description',
             }
@@ -29,7 +29,7 @@ const list_room_template = `
 <div>
     <label>{{labels.search.count}}</label>
     <div class="select is-rounded">
-        <select id="viewCount" size="1">
+        <select id="displayCount" size="1">
             <option value="5 default">5</option>
             <option value="10">10</option>
             <option value="15">15</option>
@@ -37,32 +37,30 @@ const list_room_template = `
     </div>
     <table class="table">
         <thead>
-            <th>{{labels.theaders.name}}</th>
-            <th>{{labels.theaders.description}}</th>
+            <th>{{labels.headers.name}}</th>
+            <th>{{labels.headers.description}}</th>
             <th>&nbsp;</th>
         </thead>
         <tbody>
-            <tr v-for="room in pagination.documents" v-bind:key="room.id" v-on:mouseover="toggle(room)" v-on:mouseout="toggle(room)" v-bind:id="room.id">
+            <tr v-for="room in pagination.documents" v-bind:key="room.id" v-bind:id="room.id"
+                v-on:click="editRoom(room)" v-on:mouseover="toggle(room)" v-on:mouseout="toggle(room)">
                 <td>
                     {{room.name}}
                 </td>
                 <td>
                     {{room.description}}                        
                 </td>
-                <td>
-                    <button class="button is-rounded" v-on:click="editRoom(room)">{{labels.edit}}</button>
+                <td>                    
+                    <div>                        
+                        <span class="icon is-hidden-desktop">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        <button class="button is-rounded is-hidden-mobile">{{labels.edit}}</button>
+                    </div>
                 </td>
             </tr>
         </tbody>
     </table>
-    <div v-show="pagination.pageCount > 0">
-        <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
-            <p>{{labels.page}} {{pagination.pageIndex}} of {{pagination.pageCount}}.
-            <a class="pagination-previous" v-on:click="showPagination(pagination.pageIndex-1)">Previous</a>
-            <a class="pagination-next" v-on:click="showPagination(pagination.pageIndex+1)">Next page</a>
-            <!--input class="input is-rounded" type="number" v-bind:min="1" v-bind:value="pagination.pageIndex" v-bind:max="pagination.pageCount"-->
-        </nav>
-    </div>
 </div>`;
 
 
@@ -175,9 +173,10 @@ const listrooms = Vue.component('list-rooms', {
     template: list_room_template,
         data: function() {
             return {
-                labels: locales.labels["en-US"],                
+                labels: locales.labels["en-US"],
                 pagination: {
                     documents: {},
+                    displayCount: 5,
                     pageCount: 0,
                     pageIndex: 0
                 }
@@ -194,15 +193,26 @@ const listrooms = Vue.component('list-rooms', {
         },
         methods: {
             toggle: function(room) {
-                var el = document.querySelector(`[id='${room.id}']`);
-
-                if(el.classList.contains('is-selected'))
+                var data = this.$data;
+                var el = document.querySelector(`tr[id='${room.id}']`);
+                console.log(el);
+                if(el.classList.contains('is-selected')) {
                     el.classList.remove('is-selected');
-                else
+                } else {
                     el.classList.add('is-selected');
+                }
             },
             editRoom: function(room) {
                 this.$router.push({path: `/room/edit/${room.id}`});
+            },
+            showPagination: function(pageIndex) {
+                var data = this.$data;
+                console.log(pageIndex);
+
+                if(pageIndex >= data.pagination.pageIndex 
+                    && pageIndex <= data.pagination.pageCount) {
+                            
+                }
             }
         }
 });

@@ -2,8 +2,12 @@
 @model RoomAid.Pages.IndexModel
 
 <div id="app">
-    <router-link to="/">Home</router-link>
-    <router-link to="/room/new">New Room</router-link>
+    <router-link to="/">
+        <i class="fas fa-home"></i>&nbsp;<label class="is-hidden-mobile">Home</label>        
+    </router-link>
+    <router-link to="/room/new">
+        <i class="fas fa-file-import"></i>&nbsp;<label class="is-hidden-mobile">New Room</label>
+    </router-link>
 
     <router-view></router-view>
 </div>
