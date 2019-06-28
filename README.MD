@@ -8,10 +8,7 @@ Simple ASP.NET Core 2.2 app that uses
 - Vuejs & Vue-Router - Single Page Application, SPA
 - Pagination
 - Bulma & Font-awesome icons  
-
   
-<code>
-<iframe width="560" height="315" src="https://github.com/kscott5/roomaid/blob/master/wwwroot/assets/roomaid.mp4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></code>  
   
 >[Markdown Guide](https://guides.github.com/features/mastering-markdown/)  
 >[Visual Code](https://code.visualstudio.com/)  
