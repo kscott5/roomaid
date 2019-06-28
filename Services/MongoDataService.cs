@@ -33,19 +33,26 @@ namespace RoomAid.Services {
             var emptyFilter = FilterDefinition<Room>.Empty;
             var filter = where ?? emptyFilter;
             var sortBy = sort ?? Builders<Room>.Sort.Ascending(room => room.Name);
-                        
-            var pageCount = collection.Find(emptyFilter).CountDocuments()/(limit);
             
+            var count = collection.Find(emptyFilter).CountDocuments();
+            var pageCount = (count/limit) + ((count%limit > 0)? 1: 0);
+            
+            var skip = 0;
+            if(page-1>0 && page<=pageCount) {
+                skip = (page-1)*limit /* per page */;
+            }
+
             var documents = collection.Find(filter)
                 .Limit(limit)
                 .Sort(sortBy)
-                .Skip(page > 1 ? (page-1)*limit : 0) // Skip if greater than first page
+                .Skip(skip)
                 .ToList();
 
             return new PaginationResult<Room> {
                 Documents = documents,
-                PageCount = pageCount,
-                PageIndex = page
+                Limit = limit,
+                Pages = pageCount,
+                Page = page
             };
         }
 

@@ -9,15 +9,15 @@ namespace RoomAid.Models {
         /// <summary>
         /// Limits the number of documents
         /// </summary>
-        public long DisplayCount {get; set;} = 5;
+        public long Limit {get; set;} = 5;
         
         /// <summary>
-        /// Number of pages used for DisplayCount
+        /// Number of pages used for Limit
         /// </summary>
-        public long PageCount {get; set;} = 0;
+        public long Pages {get; set;} = 0;
 
         /// <summary>
         /// Current viewable page
-        public long PageIndex {get; set;} = 0;
+        public long Page {get; set;} = 0;
     }
 }

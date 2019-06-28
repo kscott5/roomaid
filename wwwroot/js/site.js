@@ -29,8 +29,8 @@ const list_room_template = `
 <div>
     <label>{{labels.search.count}}</label>
     <div class="select is-rounded">
-        <select id="displayCount" size="1">
-            <option value="5 default">5</option>
+        <select v-model="pagination.limit" size="1" v-on:change="getRooms(pagination.page, pagination.limit);">
+            <option value="5" default>5</option>
             <option value="10">10</option>
             <option value="15">15</option>
         </select>
@@ -176,31 +176,35 @@ const listrooms = Vue.component('list-rooms', {
                 labels: locales.labels["en-US"],
                 pagination: {
                     documents: {},
-                    displayCount: 5,
-                    pageCount: 0,
-                    pageIndex: 0
+                    limit: 5,
+                    pages: 1,
+                    page: 1
                 }
             };
         },
         created: function() {
-            var data = this.$data;
-
-            this.$http.get("/api/room")
-                .then(function(response) {
-                    console.log(response);
-                    data.pagination = response.data;
-                });
+            this.getRooms(1,5);
         },
         methods: {
             toggle: function(room) {
                 var data = this.$data;
                 var el = document.querySelector(`tr[id='${room.id}']`);
-                console.log(el);
+                
                 if(el.classList.contains('is-selected')) {
                     el.classList.remove('is-selected');
                 } else {
                     el.classList.add('is-selected');
                 }
+            },
+            getRooms: function(page, limit) {
+                var data = this.$data;
+
+                this.$http.get(`/api/room?page=${page}&limit=${limit}`)
+                    .then(function(response) {
+                        console.log(response);
+                        data.pagination = response.data;
+                    });
+    
             },
             editRoom: function(room) {
                 this.$router.push({path: `/room/edit/${room.id}`});
