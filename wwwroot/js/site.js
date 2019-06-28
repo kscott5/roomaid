@@ -71,26 +71,23 @@ const list_room_template = `
                 </td>
                 <td>                    
                     <div>                        
-                        <span class="icon is-hidden-desktop">
+                        <a class="icon is-hidden-desktop" v-on:click="editRoom(room)">
                             <i class="fas fa-edit"></i>
-                        </span>
+                        </a>
                         <button class="button is-rounded is-hidden-mobile">{{labels.edit}}</button>
                     </div>
                 </td>
             </tr>
         </tbody>
-        <tfooter>
-
-        </tfooter>
     </table>
 </div>`;
 
 
 const edit_room_template = `
-<form>
+<form id="editRoom">
     <div class="field">
         <div class="control">
-            <input type="textbox"  v-model="room.name" :placeholder="labels.name"/>
+            <input type="textbox" required v-model="room.name" :placeholder="labels.name"/>
         </div>
     </div>
 
@@ -125,13 +122,15 @@ const edit_room_template = `
     </div>
 
     <div class="field">
-        <p class="control">
-             <button v-on:click="saveData" class="button is-success">{{labels.save}}</button>
-        </p>
+        <button class="button icon no-border is-hidden-desktop" v-on:click="saveData">
+            <i class="fas fa-cloud-upload-alt"></i>            
+        </button>
+        <button v-on:click="saveData" class="button is-rounded is-hidden-mobile">{{labels.save}}</button>
     </div>
 </form>`;
 
-const newroom = Vue.component('new-room', {
+const editnewroom = Vue.component('edit-new-room', {
+    props: ["id"],
     template: edit_room_template,
     data: function() {
         return {
@@ -140,54 +139,48 @@ const newroom = Vue.component('new-room', {
         };
     },
     methods: {
+        clearData: function() {
+            this.$data.room = {name:'',description:'',edges:'',length:'',width:'',height:''};
+        },
         saveData: function() {
-            var data = this.$data;
-            this.$http.post(`api/room/`, data.room)
-                .then(function(response) {
-                    console.log(response);
-                    if(response.status == 200) {
-                        this.$router.push({path: `/`});
-                    }
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-        }}
-});
+            if(!document.querySelector("#editRoom").checkValidity())
+                return;
 
-const editroom = Vue.component('edit-room', {
-    props: ["id"],
-    template: edit_room_template,
-    data: function() {
-        return {
-            labels: locales.labels["en-US"],
-            room: {}
-        };
-    },
-    methods: {
-        saveData: function(event) {
-            var data = this.$data;
-            this.$http.post(`api/room/update`, data.room)
-                .then(function(response){
-                    console.log(response)
-                    if(response.status == 200) {
-                        this.$router.push({path: `/`});
-                    }
+            var url = `/api/room/update`;
+            if(this.$route.name == 'newroom')
+                url = `/api/room`;
+            
+            var routeHome = this.routeHome;
+            this.$http.post(url, this.$data.room)
+                .then(function(response){                    
+                    routeHome();
                 })
                 .catch(function(error) {
                     console.log(error);
                 });
+        },
+        routeHome: function() {
+            this.$router.push({path: `/`});
+        }
+    },
+    watch: {
+        // Usable component
+        '$route'(to, from){
+            if(to.name == 'newroom') {
+                this.clearData();
+            }
         }
     },
     created: function() {
         var data = this.$data;
         var props = this.$props;
 
-        this.$http.get(`/api/room/${props.id}`)
-            .then(function(response) {
-                console.log(response);
-                data.room = response.data;
-            }); 
+        if(this.$route.name == `editroom`) {   
+            this.$http.get(`/api/room/${props.id}`)
+                .then(function(response) {                    
+                    data.room = response.data;
+                });
+        }
     }
 });
 
@@ -223,7 +216,6 @@ const listrooms = Vue.component('list-rooms', {
 
                 this.$http.get(`/api/room?page=${page}&limit=${limit}`)
                     .then(function(response) {
-                        console.log(response);
                         data.pagination = response.data;
                     });
     
@@ -246,15 +238,18 @@ const listrooms = Vue.component('list-rooms', {
 const routes = [
     {
         path: "/", 
+        name: "home",
         component: listrooms
     },
     {
         path: "/room/new",
-        component: newroom
+        name: 'newroom',
+        component: editnewroom,
     },
     {
         path: "/room/edit/:id",
-        component: editroom,
+        name: "editroom",
+        component: editnewroom,
         props: true
     }
 ];
