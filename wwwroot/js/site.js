@@ -25,22 +25,41 @@ const locales = {
     }
 };
 
+const list_room_navigation_template = `
+<tr>
+    <th>
+       {{labels.headers.name}}
+    </th>
+    <th>
+       {{labels.headers.description}}
+    </th>
+    <th>
+        <div class="tags is-medium">
+            <div class="tag is-white is-hidden-mobile">
+                <label>{{labels.search.count}}</label>
+            </div>
+            <div class="tag is-white">
+                <div class="select is-rounded">
+                    <select v-model="pagination.limit" size="1" v-on:change="getRooms(pagination.page, pagination.limit);">
+                        <option value="5" default>5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </th>
+</tr>`;
+
 const list_room_template = `
 <div>
-    <label>{{labels.search.count}}</label>
-    <div class="select is-rounded">
-        <select v-model="pagination.limit" size="1" v-on:change="getRooms(pagination.page, pagination.limit);">
-            <option value="5" default>5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-        </select>
-    </div>
     <table class="table">
         <thead>
-            <th>{{labels.headers.name}}</th>
-            <th>{{labels.headers.description}}</th>
-            <th>&nbsp;</th>
+            ${list_room_navigation_template}
         </thead>
+        <tfoot>
+            ${list_room_navigation_template}
+        </tfoot>
         <tbody>
             <tr v-for="room in pagination.documents" v-bind:key="room.id" v-bind:id="room.id"
                 v-on:click="editRoom(room)" v-on:mouseover="toggle(room)" v-on:mouseout="toggle(room)">
@@ -60,6 +79,9 @@ const list_room_template = `
                 </td>
             </tr>
         </tbody>
+        <tfooter>
+
+        </tfooter>
     </table>
 </div>`;
 
