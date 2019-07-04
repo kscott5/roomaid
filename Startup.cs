@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,18 @@ namespace RoomAid
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddCors( option => {
+                    option.AddPolicy(this.Configuration.GetValue<string>("corspolicy:name"),
+                        builder => {
+                            builder.WithOrigins(this.Configuration.GetValue<string>("corspolicy:origins").Split(";"))
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                        }
+                    );
+            });
+
             services.AddMemoryCache();
+            services.AddSession();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMongoDataService();
         }
@@ -53,8 +65,9 @@ namespace RoomAid
 
             
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseSession();
 
+            app.UseCors(this.Configuration.GetValue<string>("corspolicy:name"));
             app.UseMvc();
         }
     }
