@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 using RoomAid.Models;
@@ -25,11 +23,19 @@ namespace RoomAid.Services {
 
             var client = new MongoClient(connectionUrl);
             this.Database = client.GetDatabase(databaseName);
+            
+            this.Database.RoomIndexes();
+        }
+
+        public PaginationResult<Room> GetRooms(string text = null, string sort = null, int page = 1, int limit = 5) {
+            var where = (!String.IsNullOrWhiteSpace(text)) ? Builders<Room>.Filter.Text(text): null;
+             
+            return this.GetRooms(where, null, page, limit);
         }
 
         public PaginationResult<Room> GetRooms(FilterDefinition<Room> where = null, SortDefinition<Room> sort = null, int page = 1, int limit = 5) {
-            var collection = this.Database.GetCollection<Room>(Room.COLLECTION_NAME);
-
+            var collection = this.Database.RoomCollection();
+            
             var emptyFilter = FilterDefinition<Room>.Empty;
             var filter = where ?? emptyFilter;
             var sortBy = sort ?? Builders<Room>.Sort.Ascending(room => room.Name);
@@ -66,7 +72,7 @@ namespace RoomAid.Services {
         public Room InsertNewRoom(Room room) {
             this.Logger.LogDebug($"InsertNewRoom({room}");
 
-            var collection = this.Database.GetCollection<Room>(Room.COLLECTION_NAME);
+            var collection =  this.Database.RoomCollection();
             
             // automap generates a unique identifier
             collection.InsertOne(room);
@@ -79,10 +85,10 @@ namespace RoomAid.Services {
         public Room UpdateRoom(Room room) {
             this.Logger.LogDebug($"UpdateRoom({room}");
 
-            var collection = this.Database.GetCollection<Room>(Room.COLLECTION_NAME);
+            var collection =  this.Database.RoomCollection();
             
             var filter = Builders<Room>.Filter.Eq("_id", room.Id);
-            var update = Builders<Room>.Update.Definition(room);
+            var update = Builders<Room>.Update.RoomDefinition(room);
             
             collection.UpdateOne(filter, update);
 
