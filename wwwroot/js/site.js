@@ -25,6 +25,24 @@ const locales = {
     }
 };
 
+const site_navigation_template = `
+<div>
+    <router-link to="/">
+        <i class="fas fa-home"></i>&nbsp;<label class="is-hidden-mobile">Home</label>        
+    </router-link>
+    <router-link to="/room/new">
+        <i class="fas fa-cloud-upload-alt"></i>&nbsp;<label class="is-hidden-mobile">New Room</label>
+    </router-link>
+    </div>
+
+    <div>
+    <input type="text" class="input is-rounded" v-model:text="searchOptions.phrase">
+    </input>
+    <a class="icon" v-on:click="search()">
+        <i class="fas fa-search"></i>
+    </a>
+</div>`;
+
 const list_room_navigation_template = `
 <tr>
     <th>
@@ -40,7 +58,7 @@ const list_room_navigation_template = `
             </div>
             <div class="tag is-white">
                 <div class="select is-rounded">
-                    <select v-model="pagination.limit" size="1" v-on:change="getRooms(pagination.page, pagination.limit);">
+                    <select v-model="pagination.limit" size="1" v-on:change="getRooms();">
                         <option value="5" default>5</option>
                         <option value="10">10</option>
                         <option value="15">15</option>
@@ -53,6 +71,7 @@ const list_room_navigation_template = `
 
 const list_room_template = `
 <div>
+    ${site_navigation_template}
     <table class="table">
         <thead>
             ${list_room_navigation_template}
@@ -84,53 +103,80 @@ const list_room_template = `
 
 
 const edit_room_template = `
-<form id="editRoom">
-    <div class="field">
-        <div class="control">
-            <input type="textbox" required v-model="room.name" :placeholder="labels.name"/>
+<div>
+    ${site_navigation_template}
+    <form id="editRoom">
+        <div class="field">
+            <div class="control">
+                <input type="textbox" required v-model="room.name" :placeholder="labels.name"/>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <div class="control">
-            <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
+        <div class="field">
+            <div class="control">
+                <input type="textarea" v-model="room.description" :placeholder="labels.description" multiple="5"/>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <div class="control">
-            <input type="number" v-model="room.edges" min="3" max="10" />
+        <div class="field">
+            <div class="control">
+                <input type="number" v-model="room.edges" min="3" max="10" />
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <div class="control">
-            <input type="number" v-model="room.length" min="0" max="10"/>
+        <div class="field">
+            <div class="control">
+                <input type="number" v-model="room.length" min="0" max="10"/>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <div class="control">
-             <input type="number" v-model="room.height" min="0" max="10"/>
+        <div class="field">
+            <div class="control">
+                <input type="number" v-model="room.height" min="0" max="10"/>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <div class="control">
-             <input type="number" v-model="room.width" min="0" max="10"/>
+        <div class="field">
+            <div class="control">
+                <input type="number" v-model="room.width" min="0" max="10"/>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <button class="button icon no-border is-hidden-desktop" v-on:click="saveData">
-            <i class="fas fa-cloud-upload-alt"></i>            
-        </button>
-        <button v-on:click="saveData" class="button is-rounded is-hidden-mobile">{{labels.save}}</button>
-    </div>
-</form>`;
+        <div class="field">
+            <button class="button icon no-border is-hidden-desktop" v-on:click="saveData">
+                <i class="fas fa-cloud-upload-alt"></i>            
+            </button>
+            <button v-on:click="saveData" class="button is-rounded is-hidden-mobile">{{labels.save}}</button>
+        </div>
+    </form>
+</div>`;
 
-const editnewroom = Vue.component('edit-new-room', {
-    props: ["id"],
+const navigationMixins = {
+    data: function() {
+        return {
+            searchOptions: {
+                phrase: '',
+                sort: ''
+            }
+        };
+    },
+    beforeRouteEnter (to, from, next) {
+        console.log(`from ${from.name} list Room Mixins before route enter`);
+        next();
+    },
+    methods: {
+        search: function() {
+            var query = this.$data.searchOptions;
+            this.$router.push({name: 'search', query: { phrase: `${query.phrase}`, sort: `${query.sort}`}});
+        }
+    },
+    watch: {
+        '$route'(to,from) {
+        }
+    }
+};
+
+const editRoomMixin = {
     template: edit_room_template,
     data: function() {
         return {
@@ -142,14 +188,13 @@ const editnewroom = Vue.component('edit-new-room', {
         clearData: function() {
             this.$data.room = {name:'',description:'',edges:'',length:'',width:'',height:''};
         },
-        saveData: function() {
+        routeHome: function() {
+            this.$router.push({name: `home`});
+        },
+        saveRoomData: function(url) {
             if(!document.querySelector("#editRoom").checkValidity())
                 return;
 
-            var url = `/api/room/update`;
-            if(this.$route.name == 'newroom')
-                url = `/api/room`;
-            
             var routeHome = this.routeHome;
             this.$http.post(url, this.$data.room)
                 .then(function(response){                    
@@ -158,81 +203,107 @@ const editnewroom = Vue.component('edit-new-room', {
                 .catch(function(error) {
                     console.log(error);
                 });
-        },
-        routeHome: function() {
-            this.$router.push({path: `/`});
         }
-    },
-    watch: {
-        // Usable component
-        '$route'(to, from){
-            if(to.name == 'newroom') {
-                this.clearData();
-            }
+    }
+};
+
+const editroom = Vue.component('editRooms', {
+    mixins: [navigationMixins, editRoomMixin],
+    props: ["id"],
+    methods: {
+        saveData: function() {
+            this.saveRoomData(`/api/room/update`);
         }
     },
     created: function() {
         var data = this.$data;
         var props = this.$props;
 
-        if(this.$route.name == `editroom`) {   
-            this.$http.get(`/api/room/${props.id}`)
-                .then(function(response) {                    
-                    data.room = response.data;
-                });
+        this.$http.get(`/api/room/${props.id}`)
+            .then(function(response) {                    
+                data.room = response.data;
+            });
+    }
+});
+
+const newroom = Vue.component('newRooms', {
+    mixins: [navigationMixins, editRoomMixin],
+    methods: {
+        saveData: function() {
+            this.saveRoomData(`/api/room`);
         }
     }
 });
 
-const listrooms = Vue.component('list-rooms', {
-    template: list_room_template,
-        data: function() {
-            return {
-                labels: locales.labels["en-US"],
-                pagination: {
-                    documents: {},
-                    limit: 5,
-                    pages: 1,
-                    page: 1
-                }
+const listRoomMixin = {
+    data: function() {
+        return {
+            labels: locales.labels["en-US"],
+            pagination: {
+                documents: {},
+                limit: 5,
+                pages: 1,
+                page: 1
+            }
+        };
+    },
+    created: function() {
+        var query = this.$data.searchOptions = this.$route.query;
+        var phrase = ("phrase" in query)? query.phrase: '';
+        var sort = ("sort" in query)? query.sort: '';
+
+        this.getRooms({page: 1, limit: 5, phrase: `${phrase}`, sort: `${sort}` });
+    },
+    methods: {
+        toggle: function(room) {
+            var data = this.$data;
+            var el = document.querySelector(`tr[id='${room.id}']`);
+            
+            if(el.classList.contains('is-selected')) {
+                el.classList.remove('is-selected');
+            } else {
+                el.classList.add('is-selected');
+            }
+        },
+        getRooms: function(options) {                
+            var data = this.$data;
+
+            var params = {
+                page: (options && options.page)? options.page: data.pagination.page,
+                limit: (options && options.limit)? options.limit: data.pagination.limit,
+                phrase: (options && options.phrase)? options.phrase: data.searchOptions.phrase, //Mixin
+                sort: (options && options.sort)? options.sort: data.searchOptions.sort, // Mixin
             };
-        },
-        created: function() {
-            this.getRooms(1,5);
-        },
-        methods: {
-            toggle: function(room) {
-                var data = this.$data;
-                var el = document.querySelector(`tr[id='${room.id}']`);
-                
-                if(el.classList.contains('is-selected')) {
-                    el.classList.remove('is-selected');
-                } else {
-                    el.classList.add('is-selected');
-                }
-            },
-            getRooms: function(page, limit) {
-                var data = this.$data;
+            
+            this.$http.get('/api/room', {params: params})
+                .then(function(response) {
+                    data.pagination = response.data;
+                });
 
-                this.$http.get(`/api/room?page=${page}&limit=${limit}`)
-                    .then(function(response) {
-                        data.pagination = response.data;
-                    });
-    
-            },
-            editRoom: function(room) {
-                this.$router.push({path: `/room/edit/${room.id}`});
-            },
-            showPagination: function(pageIndex) {
-                var data = this.$data;
-                console.log(pageIndex);
+        },
+        editRoom: function(room) {
+            this.$router.push({path: `/room/edit/${room.id}`});
+        },
+        showPagination: function(pageIndex) {
+            var data = this.$data;
+            console.log(pageIndex);
 
-                if(pageIndex >= data.pagination.pageIndex 
-                    && pageIndex <= data.pagination.pageCount) {
-                            
-                }
+            if(pageIndex >= data.pagination.pageIndex 
+                && pageIndex <= data.pagination.pageCount) {
+                        
             }
         }
+    }
+};
+
+const listrooms = Vue.component('listRooms', {
+    mixins: [navigationMixins, listRoomMixin],
+    template: list_room_template
+});
+
+const searchrooms = Vue.component('searchRooms', {
+    mixins: [navigationMixins, listRoomMixin],
+    template: list_room_template
 });
 
 const routes = [
@@ -242,14 +313,19 @@ const routes = [
         component: listrooms
     },
     {
+        path: "/search", 
+        name: "search",
+        component: searchrooms
+    },
+    {
         path: "/room/new",
         name: 'newroom',
-        component: editnewroom,
+        component: newroom,
     },
     {
         path: "/room/edit/:id",
         name: "editroom",
-        component: editnewroom,
+        component: editroom,
         props: true
     }
 ];

@@ -20,8 +20,8 @@ namespace RoomAid.Controllers {
         }
 
         [HttpGet]
-        public ActionResult<PaginationResult<Room>> GetRooms([FromQuery] int page = 1, int limit = 5, string search = "", string sort = null) {
-            var rooms = this.DataService.GetRooms(search, sort, page, limit);
+        public ActionResult<PaginationResult<Room>> GetRooms([FromQuery] int page = 1, int limit = 5, string phrase = "", string sort = null) {
+            var rooms = this.DataService.GetRooms(phrase, sort, page, limit);
             return new ObjectResult(rooms);
         }
 
