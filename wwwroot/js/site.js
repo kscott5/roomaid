@@ -160,18 +160,12 @@ const navigationMixins = {
             }
         };
     },
-    beforeRouteEnter (to, from, next) {
-        console.log(`from ${from.name} list Room Mixins before route enter`);
-        next();
-    },
     methods: {
-        search: function() {
+        search: function() {                        
             var query = this.$data.searchOptions;
-            this.$router.push({name: 'search', query: { phrase: `${query.phrase}`, sort: `${query.sort}`}});
-        }
-    },
-    watch: {
-        '$route'(to,from) {
+
+            ('getRooms' in this)? this.getRooms() :
+            this.$router.push({path: '/search', query: { phrase: `${query.phrase}`, sort: `${query.sort}`}});
         }
     }
 };
