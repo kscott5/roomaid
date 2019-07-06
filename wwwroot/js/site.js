@@ -275,8 +275,14 @@ const listRoomMixin = {
                 });
 
         },
-        editRoom: function(room) {
-            this.$router.push({path: `/room/edit/${room.id}`});
+        editRoom: function(room) {       
+            var query = {
+                phrase: this.$data.searchOptions.phrase, //Mixin
+                sort: this.$data.searchOptions.sort, // Mixin
+            };                       
+
+            this.$router.push({name: `editroom`, params: { id: `${room.id}`},
+                query: query});
         },
         showPagination: function(pageIndex) {
             var data = this.$data;
